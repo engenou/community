@@ -15,7 +15,7 @@ spring:
     host: smtp.qq.com #smtp.sina.com
     #port: 465
     username: 1533183133@qq.com #nowcoder@sina.com #1533183133@qq.com
-    password: cflnvstzyldjgcch #nowcoder123 #ouchenggen1997..
+    password: #nowcoder123 
     default-encoding: UTF-8
     properties:
       mail:
