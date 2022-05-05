@@ -1,5 +1,7 @@
 package com.nowcoder.community.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -14,6 +16,7 @@ import java.util.Date;
 public class User {
 
     // 用户 id
+//    @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
     // 用户名
     private String username;

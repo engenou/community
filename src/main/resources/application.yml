@@ -1,5 +1,7 @@
 server:
   port: 8080
+  servlet:
+    context-path: /community #项目名、上下文路径
 
 spring:
   datasource:
@@ -7,6 +9,19 @@ spring:
     url: jdbc:mysql://localhost:3306/community?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
+
+  # email
+  mail:
+    host: smtp.qq.com #smtp.sina.com
+    #port: 465
+    username: 1533183133@qq.com #nowcoder@sina.com #1533183133@qq.com
+    password: cflnvstzyldjgcch #nowcoder123 #ouchenggen1997..
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
 
 
 mybatis:
@@ -22,3 +37,9 @@ mybatis:
 logging:
   level:
     com.nowcoder.community: debug
+
+# community
+community:
+  path:
+    domain: http://localhost:8080
+    upload: F:/work_community/upload
