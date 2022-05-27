@@ -18,15 +18,11 @@ public class AlphaService {
         System.out.println("AlphaService构造器。。。");
     }
 
-    @PostConstruct
-    public void init(){
-        System.out.println("PostConstruct初始化。。。");
-    }
+//    @PostConstruct
+    public void init(){System.out.println("PostConstruct初始化。。。");}
 
-    @PreDestroy
-    public void destroy(){
-        System.out.println("PreDestroy销毁。。。");
-    }
+//    @PreDestroy
+    public void destroy(){System.out.println("PreDestroy销毁。。。");}
 
     @Autowired
     private AlphaDao alphaDao;

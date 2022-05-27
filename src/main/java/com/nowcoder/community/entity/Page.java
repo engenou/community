@@ -71,7 +71,7 @@ public class Page {
      */
     public Integer getTotal(){
         // rows / limit [ + 1 ]
-        if(rows / limit == 0){
+        if(rows % limit == 0){
             return rows / limit;
         }else{
             return rows / limit + 1;

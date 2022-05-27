@@ -2,8 +2,11 @@ package com.nowcoder.community.controller;
 
 import com.nowcoder.community.annotation.LoginRequired;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.service.FollowService;
+import com.nowcoder.community.service.LikeService;
 import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityUtil;
+import com.nowcoder.community.util.Constant;
 import com.nowcoder.community.util.HostHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +36,12 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @Autowired
+    private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
+
     @Value("${community.path.domain}")
     private String domain;
 
@@ -58,14 +67,14 @@ public class UserController {
     @PostMapping("/upload")
     public String uploadHeader(MultipartFile headerImage, Model model){
         if(headerImage == null){
-            model.addAttribute("error","您还没有选择图片");
+            model.addAttribute("templates/error","您还没有选择图片");
             return "site/setting";
         }
         // 文件后缀
         String fileName = headerImage.getOriginalFilename();
         String suffix = fileName.substring(fileName.lastIndexOf("."));
         if(StringUtils.isBlank(suffix)){
-            model.addAttribute("error","文件格式不正确！");
+            model.addAttribute("templates/error","文件格式不正确！");
             return "site/setting";
         }
         // 生成随机文件名
@@ -134,6 +143,37 @@ public class UserController {
         model.addAttribute("NewPasswordMessage", map.get("NewPasswordMessage"));
         model.addAttribute("ConfirmPasswordMessage", map.get("ConfirmPasswordMessage"));
         return "site/setting";
+    }
+
+    /**
+     *  个人主页
+     */
+    @RequestMapping("/profile/{userId}")
+    public String getProfilePage(@PathVariable("userId") int userId, Model model){
+        User user = userService.findUserBuId(userId);
+        if(user == null){
+            throw new RuntimeException("用户不存在");
+        }
+        // 用户
+        model.addAttribute("user",user);
+        // 获赞数量
+        int userLikeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount",userLikeCount);
+
+        // 关注数量
+        long followeeCount = followService.findFolloweeCount(user.getId(), Constant.ENTITY_TYPE_USER);
+        model.addAttribute("followeeCount",followeeCount);
+        // 粉丝数量
+        long followerCount = followService.findFollowerCount(Constant.ENTITY_TYPE_USER, user.getId());
+        model.addAttribute("followerCount",followerCount);
+        // 当前用户是否已关注
+        boolean hasFollowed = false;
+        if(hostHolder.getUser() != null){
+            hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(), Constant.ENTITY_TYPE_USER,userId);
+        }
+        model.addAttribute("hasFollowed",hasFollowed);
+
+        return "site/profile";
     }
 
 

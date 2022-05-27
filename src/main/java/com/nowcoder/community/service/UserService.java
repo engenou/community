@@ -2,24 +2,18 @@ package com.nowcoder.community.service;
 
 import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
-import com.nowcoder.community.mapper.LoginTicketMapper;
 import com.nowcoder.community.mapper.UserMapper;
-import com.nowcoder.community.util.CommunityUtil;
-import com.nowcoder.community.util.Constant;
-import com.nowcoder.community.util.HostHolder;
-import com.nowcoder.community.util.MailClient;
+import com.nowcoder.community.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.naming.CompositeName;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Eugen
@@ -43,14 +37,24 @@ public class UserService {
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
-    @Autowired
-    private LoginTicketMapper loginTicketMapper;
+//    @Autowired
+//    private LoginTicketMapper loginTicketMapper;
+
 
     @Autowired
     private HostHolder hostHolder;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     public User findUserBuId(int id){
-        return userMapper.selectById(id);
+//        return userMapper.selectById(id);
+        // 查找user，先从reids缓存取，取不到再去mysql取
+        User user = getCache(id);
+        if(user == null){
+            user = initCache(id);
+        }
+        return user;
     }
 
     /**
@@ -119,6 +123,8 @@ public class UserService {
             return Constant.ACTIVATION_REPEAT;
         }else if(user.getActivationCode().equals(code)){
             userMapper.updateStatus(userId,1);
+            // 清除缓存
+            clearCache(userId);
             return Constant.ACTIVATION_SUCCESS;
         }else{
             return Constant.ACTIVATION_FAILURE;
@@ -167,7 +173,11 @@ public class UserService {
         loginTicket.setTicket(CommunityUtil.generateUUID());
         loginTicket.setStatus(0);//表示有效
         loginTicket.setExpired(new Date(System.currentTimeMillis() + expired * 1000));
-        loginTicketMapper.insertLoginTicket(loginTicket);
+//        loginTicketMapper.insertLoginTicket(loginTicket);
+
+        // 登录凭证存入redis
+        String ticketKey = RedisKeyUtil.getTicketKey(loginTicket.getTicket());
+        redisTemplate.opsForValue().set(ticketKey, loginTicket);
 
         map.put("ticket",loginTicket.getTicket());
         return map;
@@ -177,21 +187,30 @@ public class UserService {
      * 用户退出
      */
     public void logout(String ticket){
-        loginTicketMapper.updateStatus(ticket, 1);
+//        loginTicketMapper.updateStatus(ticket, 1);
+        String ticketKey = RedisKeyUtil.getTicketKey(ticket);
+        LoginTicket loginTicket = (LoginTicket) redisTemplate.opsForValue().get(ticketKey);
+        loginTicket.setStatus(1);
+        redisTemplate.opsForValue().set(ticketKey, loginTicket);
     }
 
     /**
      *  查询登录凭证 LoginTicket
      */
     public LoginTicket findLoginTicket(String ticket){
-        return loginTicketMapper.selectByTicket(ticket);
+//        return loginTicketMapper.selectByTicket(ticket);
+        String ticketKey = RedisKeyUtil.getTicketKey(ticket);
+        return (LoginTicket) redisTemplate.opsForValue().get(ticketKey);
     }
 
     /**
      *  更新头像
      */
     public int updateHeaderUrl(int userId, String headerUrl){
-        return userMapper.updateHeaderUrl(userId, headerUrl);
+//        return userMapper.updateHeaderUrl(userId, headerUrl);
+        int rows = userMapper.updateHeaderUrl(userId, headerUrl);
+        clearCache(userId);
+        return rows;
     }
 
     /**
@@ -223,11 +242,60 @@ public class UserService {
         // 修改当前登录用户密码
         newPassword = CommunityUtil.md5(newPassword + curUser.getSalt());
         userMapper.updatePassword(curUser.getId(), newPassword);
+
+        // 清除缓存
+        clearCache(curUser.getId());
+
         return map;
     }
 
+    /**
+     *  根据用户名查找用户
+     */
+    public User findUserByName(String username){
+        return userMapper.selectByUsername(username);
+    }
+
+    // 1.优先从缓存中取值
+    private User getCache(int userId){
+        String userKey = RedisKeyUtil.getUserKey(userId);
+        return (User) redisTemplate.opsForValue().get(userKey);
+    }
+
+    // 2.取不到时初始化缓存数据
+    private User initCache(int userId){
+        User user = userMapper.selectById(userId);
+        String userKey = RedisKeyUtil.getUserKey(userId);
+        redisTemplate.opsForValue().set(userKey, user, 3600, TimeUnit.SECONDS);
+        return user;
+    }
+
+    // 3.数据变更时清除缓存数据
+    private void clearCache(int userId){
+        String userKey = RedisKeyUtil.getUserKey(userId);
+        redisTemplate.delete(userKey);
+    }
 
 
+//    // 根据用户类型Type，查询权限
+//    public Collection<? extends GrantedAuthority> getAuthorities(int userId){
+//        User user = this.findUserBuId(userId);
+//        List<GrantedAuthority> list = new ArrayList<>();
+//        list.add(new GrantedAuthority() {
+//            @Override
+//            public String getAuthority() {
+//                switch (user.getType()){
+//                    case 1:
+//                        return Constant.AUTHORITY_ADMIN;
+//                    case 2:
+//                        return Constant.AUTHORITY_MODERATOR;
+//                    default:
+//                        return Constant.AUTHORITY_USER;
+//                }
+//            }
+//        });
+//        return list;
+//    }
 
 
 }
