@@ -23,8 +23,8 @@ public class DiscussPostService {
     private SensitiveFilter sensitiveFilter;
 
     // 查询帖子
-    public List<DiscussPost> findDiscussPost(int userId, int offset, int limit){
-        return discussPostMapper.selectDiscussPost(userId, offset, limit);
+    public List<DiscussPost> findDiscussPost(int userId, int offset, int limit, int orderMode){
+        return discussPostMapper.selectDiscussPost(userId, offset, limit, orderMode);
     }
 
     // 查询帖子总数
@@ -57,5 +57,19 @@ public class DiscussPostService {
         return discussPostMapper.updateCommentCount(id, commentCount);
     }
 
+    // 更新帖子类型：置顶
+    public int updateType(int id, int type){
+        return discussPostMapper.updateType(id, type);
+    }
+
+    // 更新帖子状态：普通  加精
+    public int updateStatus(int id, int status){
+        return discussPostMapper.updateStatus(id, status);
+    }
+
+    // 更新帖子分数
+    public int updateScore(int id, double score){
+        return discussPostMapper.updateScore(id, score);
+    }
 
 }

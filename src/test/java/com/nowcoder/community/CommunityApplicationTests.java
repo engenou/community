@@ -1,7 +1,7 @@
 package com.nowcoder.community;
 
 import com.nowcoder.community.service.AlphaService;
-import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
@@ -16,7 +16,7 @@ class CommunityApplicationTests implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    @Test
+//    @Test
     public void testApplicationContext(){
         System.out.println(applicationContext);
 

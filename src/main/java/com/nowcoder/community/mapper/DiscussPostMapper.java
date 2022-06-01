@@ -19,9 +19,10 @@ public interface DiscussPostMapper {
      * @param userId 用户 id
      * @param offset 每页起始行行号
      * @param limit 一页显示多少条数据
+     * @param orderMode 0-最新  1-最热
      * @return
      */
-    List<DiscussPost> selectDiscussPost(int userId, int offset, int limit);
+    List<DiscussPost> selectDiscussPost(int userId, int offset, int limit, int orderMode);
 
     /**
      *  查询帖子的行数
@@ -47,4 +48,16 @@ public interface DiscussPostMapper {
      */
     int updateCommentCount(int id, int commentCount);
 
+    /**
+     * 更新帖子类型：0：普通   1：置顶
+     */
+    int updateType(int id, int type);
+
+    /**
+     *  更新帖子状态 ： 0-正常    1-精华    2-拉黑
+     */
+    int updateStatus(int id, int status);
+
+    // 更新分数
+    int updateScore(int id, double score);
 }

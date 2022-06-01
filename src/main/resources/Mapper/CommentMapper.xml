@@ -55,7 +55,7 @@
     </select>
 
 <!--  VALUES(#{userId},#{entityType},#{entityId},#{targetId},#{content},#{status}, #{createTime}) -->
-    <insert id="insertComment" parameterType="com.nowcoder.community.entity.Comment">
+    <insert id="insertComment" useGeneratedKeys="true" keyProperty="id" parameterType="com.nowcoder.community.entity.Comment">
         insert into comment(<include refid="insertSelectiveFields"></include>)
         values(<include refid="insertSelectiveValues"></include>)
     </insert>

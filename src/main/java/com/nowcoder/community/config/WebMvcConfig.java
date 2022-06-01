@@ -1,6 +1,7 @@
 package com.nowcoder.community.config;
 
 import com.nowcoder.community.annotation.LoginRequired;
+import com.nowcoder.community.interceptor.DataInterceptor;
 import com.nowcoder.community.interceptor.LoginRequiredInteceptor;
 import com.nowcoder.community.interceptor.LoginTicketInterceptor;
 import com.nowcoder.community.interceptor.MessageInteceptor;
@@ -19,11 +20,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private LoginTicketInterceptor loginTicketInterceptor;
 
-    @Autowired
-    private LoginRequiredInteceptor loginRequiredInteceptor;
+//    @Autowired
+//    private LoginRequiredInteceptor loginRequiredInteceptor;
 
     @Autowired
     private MessageInteceptor messageInteceptor;
+
+    @Autowired
+    private DataInterceptor dataInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -31,11 +35,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 // 除了静态资源外都拦截
                 .excludePathPatterns("/static/**");
 
-        registry.addInterceptor(loginRequiredInteceptor)
+//        registry.addInterceptor(loginRequiredInteceptor)
+//                // 除了静态资源外都拦截
+//                .excludePathPatterns("/static/**");
+
+        registry.addInterceptor(messageInteceptor)
                 // 除了静态资源外都拦截
                 .excludePathPatterns("/static/**");
 
-        registry.addInterceptor(messageInteceptor)
+        registry.addInterceptor(dataInterceptor)
                 // 除了静态资源外都拦截
                 .excludePathPatterns("/static/**");
     }

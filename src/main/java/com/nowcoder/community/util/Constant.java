@@ -56,6 +56,10 @@ public class Constant {
     public static final String TOPIC_LIKE = "like";
     // 关注
     public static final String TOPIC_FOLLOW = "folloW";
+    // 发帖
+    public static final String TOPIC_PUBLISH = "publish";
+    // 删帖
+    public static final String TOPIC_DELETE = "delete";
 
     /**
      *  系统用户 Id

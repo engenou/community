@@ -1,7 +1,10 @@
 package com.nowcoder.community.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +17,8 @@ import java.util.List;
  */
 @Data //lombok注解
 @TableName("user")
+@JsonIgnoreProperties({"enabled","accountNonExpired", "accountNonLocked",
+                "credentialsNonExpired", "authorities"})  //序列化User时，忽略这些属性
 public class User /*implements UserDetails*/ {
 
     // 用户 id
@@ -55,7 +60,7 @@ public class User /*implements UserDetails*/ {
 //        });
 //        return list;
 //    }
-//
+
 //    @Override
 //    public boolean isAccountNonExpired() {
 //        return true;

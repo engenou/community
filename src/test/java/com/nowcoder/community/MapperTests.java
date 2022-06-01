@@ -8,11 +8,10 @@ import com.nowcoder.community.mapper.DiscussPostMapper;
 import com.nowcoder.community.mapper.LoginTicketMapper;
 import com.nowcoder.community.mapper.MessageMapper;
 import com.nowcoder.community.mapper.UserMapper;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.jws.Oneway;
 import java.util.Date;
 import java.util.List;
 
@@ -68,7 +67,7 @@ public class MapperTests {
 
     @Test
     public void tsetSelectPosts(){
-        List<DiscussPost> list = discussPostMapper.selectDiscussPost(111, 0, 10);
+        List<DiscussPost> list = discussPostMapper.selectDiscussPost(111, 0, 10, 0);
         for(DiscussPost post : list){
             System.out.println(post);
         }
