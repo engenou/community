@@ -91,3 +91,10 @@ community:
   path:
     domain: http://localhost:8080
     upload: F:/work_community/upload
+
+# caffeine
+caffeine:
+  # 帖子
+  posts:
+    max-size: 15
+    expire-seconds: 180
